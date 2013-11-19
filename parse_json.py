@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import json
-
+'''
+Short demo on how to parse JSON format
+'''
 
 
 data = []

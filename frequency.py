@@ -4,17 +4,28 @@ import sys
 import json
 import re
 
+'''
+Script to determine how many times a word is in one tweet
+'''
 
 
 def tweet_parse():
+    '''
+    Parse JSON tweets
+    Returns list of parsed tweets and all metadata
+    '''
     data = []
     tweet = []
-    with open(sys.argv[1]) as f:
-        for line in f:
-            data.append(json.loads(line))
-        for item in data:
-            tweet.append(item['text'])
-    f.close()
+    try:
+        with open(sys.argv[1]) as f:
+            for line in f:
+                data.append(json.loads(line))
+            for item in data:
+                if 'text' in item:
+                    tweet.append(item['text'])
+    except (IOError, OSError) as e:
+         sys.exit('Could not open file %s' % sys.argv[1])
+        
     return tweet
 
 def get_frequency(tweets):
@@ -41,6 +52,8 @@ def get_frequency(tweets):
         
                
 def main():
+    if len(sys.argv) < 2:
+        sys.exit('Usage: %s output.txt' % sys.argv[0])
     tweets = tweet_parse()
     get_frequency(tweets)
     

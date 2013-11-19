@@ -3,6 +3,9 @@
 
 import urllib
 import json
+'''
+Short demo on how to get tweets and print them out
+'''
 
 for i in range(10):
     page = i + 1

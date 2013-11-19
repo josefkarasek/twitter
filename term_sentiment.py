@@ -4,6 +4,9 @@ import sys
 import json
 import re
 
+'''
+Script to determine sentiment of english written tweets
+'''
     
 def affin_parse(sent_file):
     scores = {} # initialize an empty dictionary
@@ -15,13 +18,17 @@ def affin_parse(sent_file):
 def tweet_parse():
     data = []
     tweet = []
-    with open(sys.argv[2]) as f:
-        for line in f:
-            data.append(json.loads(line))
-        for item in data:
-#             if item['lang'] == 'en':
-            tweet.append(item['text'])
-    f.close()
+    try:
+        with open(sys.argv[2]) as f:
+            for line in f:
+                data.append(json.loads(line))
+            
+            for item in data:
+                if 'text' in item and 'lang' in item:
+                    if item['lang'] == 'en':
+                        tweet.append(item['text'])
+    except (IOError, OSError) as e:
+         sys.exit('Could not open file %s' % sys.argv[2])
     return tweet
 
 def get_sentiment(affin, tweets):
@@ -29,19 +36,16 @@ def get_sentiment(affin, tweets):
     appereances = {}
     for tweet in tweets:
         missed = []
-#         print tweet.encode('UTF-8')
         sentiment = 0
         splited = tweet.split(' ')
         for word in splited:
             if word in affin:
-#                 print word
                 sentiment += affin[word]
             else:
                 missed.append(word)
                 
         for word in missed:
             if word in new_dict:
-#                 print word.encode('UTF-8')
                 if word in appereances:
                     appereances[word.lower()] += 1
                 else:
@@ -49,17 +53,21 @@ def get_sentiment(affin, tweets):
                 new_dict[word.lower()] += sentiment
             else:
                 new_dict[word.lower()] = sentiment
-#         print sentiment
         
     for word in appereances.items():
         new_dict[word[0]] /= word[1]
     for item in new_dict.items():
         print item[0].encode('UTF-8'), item[1]
-#     print new_dict
-#     print appereances
+
     
 def main():
-    sent_file = open(sys.argv[1])
+    if len(sys.argv) < 3:
+        sys.exit('Usage: %s AFFIN-111.txt output.txt' % sys.argv[0])
+    try:
+        sent_file = open(sys.argv[1])
+    except:
+        sys.exit('Could not open file %s' % sys.argv[1])
+        
     affin = affin_parse(sent_file)
     tweets = tweet_parse()
     get_sentiment(affin, tweets)

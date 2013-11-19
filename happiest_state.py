@@ -4,7 +4,10 @@ import sys
 import json
 import re
 
-    
+'''
+Script to determine which state is the happiest.
+Twitter users do not provide reliable location info - this task is hardly possible.
+'''
 def affin_parse(sent_file):
     scores = {} # initialize an empty dictionary
     for line in sent_file:
@@ -15,19 +18,20 @@ def affin_parse(sent_file):
 def tweet_parse():
     data = []
     tweet = []
-    with open(sys.argv[2]) as f:
-        for line in f:
-            data.append(json.loads(line))
-        for item in data:
-            if 'user' in item:
-#                 print
-                print item['user']['location'].strip('\r\n').encode('UTF-8')
-            if 'lang' in item and item['lang'] == 'en':
-                tweet.append(item['text'])
+    
+    try:
+        with open(sys.argv[2]) as f:
+            for line in f:
+                data.append(json.loads(line))
+            for item in data:
+                if 'user' in item:
+    #                 print
+                    print item['user']['location'].strip('\r\n').encode('UTF-8')
+                if 'lang' in item and item['lang'] == 'en':
+                    tweet.append(item['text'])
+    except (IOError, OSError) as e:
+        sys.exit('Could not open file %s' % sys.argv[2])
                 
-                
-                
-    f.close()
     return tweet
 
 def get_sentiment(affin, tweets):
@@ -40,10 +44,16 @@ def get_sentiment(affin, tweets):
         print sentiment
     
 def main():
-    sent_file = open(sys.argv[1])
+    if len(sys.argv) < 3:
+        sys.exit('Usage: %s AFFIN-111.txt output.txt' % sys.argv[0])
+    try:
+        sent_file = open(sys.argv[1])
+    except:
+        sys.exit('Could not open file %s' % sys.argv[1])
+
     affin = affin_parse(sent_file)
     tweets = tweet_parse()
-#     get_sentiment(affin, tweets)
+    get_sentiment(affin, tweets)
     
 if __name__ == '__main__':
     main()
